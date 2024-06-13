@@ -1,6 +1,9 @@
 import { Component, NgModule, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { Observable, Subscription } from 'rxjs';
 import { AuthService } from 'src/app/Services/AuthService/auth.service';
+import { DatabaseService, RepOut } from 'src/app/Services/DatabaseService/database.service';
+
 // @ts-ignore
 
 export interface DocumentSnapshotExists<T> extends firebase.firestore.DocumentSnapshot {
@@ -22,19 +25,24 @@ export class RegistroComponent implements OnInit {
   email: string = '';
   password: string = '';
   errorMessage: string = '';
+  nombre: string= '';
+  apellido: string= '';
+  telefono: number = 0;
 
-  constructor(private authService: AuthService, private router: Router) { }
+
+  constructor(private authService: AuthService, private router: Router, private db : DatabaseService) { }
   ngOnInit(){}
 
   // metodo llama a AuthService para registrar, luego, si es efectivo el registro, inicia sesion
   async register() {
-    if (!this.email || !this.password) {
+    if (!this.email || !this.password || !this.nombre || !this.apellido || !this.telefono) {
       this.errorMessage = 'Por favor, completa todos los campos.';
     } else {
     try {
     const result = await this.authService.signUp(this.email, this.password);
     if (result == true) {
       this.authService.signIn(this.email, this.password);
+      this.db.AddRep(this.nombre, this.email, this.telefono, this.apellido);
       this.router.navigate(['/main']);
     }}
     catch (error) {

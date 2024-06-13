@@ -3,11 +3,12 @@ import { AuthService } from 'src/app/Services/AuthService/auth.service';
 import { Router } from '@angular/router';
 
 import { getDatabase, ref} from 'firebase/database';
-import { firebaseApp } from 'src/environments/environment';
+import { database } from 'src/environments/environment';
 import { DataService } from 'src/app/Services/DataService/data.service';
+import { DatabaseService,RepOut } from 'src/app/Services/DatabaseService/database.service';
+import { Observable,Subscription } from 'rxjs';
 
 
-const database = getDatabase(firebaseApp);
 
 @Component({
   selector: 'app-inicses',
@@ -19,25 +20,36 @@ export class InicsesComponent  implements OnInit {
   password: string = '';
   errorMessage: string = '';
   email: string = '';
+  rep$: Observable<RepOut[]> |undefined;
 
-  constructor(private authService: AuthService, private router:Router, private data:DataService) {}
+  constructor(private authService: AuthService, private router:Router, private data:DataService, private db: DatabaseService) {}
 
 
   //metodo llama a authService para iniciar sesion
   async Login() {
-    const result = await this.authService.signIn(this.email, this.password);
-    if (result!== true){
-      this.errorMessage = 'error con usuario o contraseña, intente nuevamente';
-    } else {
-      console.log(this.authService.checkAuthentication())
-      const usuario = [this.email, this.password];
-      this.data.setItem('user', usuario);
-      const a = await this.data.getItem('user');
-      console.log(a)
-      this.router.navigate(['/main']);
-
+    this.rep$ =  this.db.loadRep(this.email);
+    this.rep$.subscribe({
+      next: async (repas: RepOut[]) => {
+        if (repas.length > 0) {
+          const rep = repas[0];
+          if (rep.tipo_usuario === 'repartidor') {
+            const resultado = await this.authService.signIn(this.email, this.password);
+            if (resultado !== true) {
+              this.errorMessage = 'Error con usuario o contraseña, intente nuevamente';
+              return;
+            }
+          else{
+            const repa = [this.email, this.password];
+            this.data.setItem('repa', repa);
+            const a = await this.data.getItem('repa');
+            this.router.navigate(['/main']);
+          }
+        }}
+            else{
+              this.errorMessage = 'usuario no existe';
+            }
+          }})
     }
-  } 
   async ngOnInit() {
     await this.data.set('name', 'Ionic');
   }
