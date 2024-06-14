@@ -35,7 +35,7 @@ export class InicsesComponent  implements OnInit {
           if (rep.tipo_usuario === 'repartidor') {
             const resultado = await this.authService.signIn(this.email, this.password);
             if (resultado !== true) {
-              this.errorMessage = 'Error con usuario o contraseña, intente nuevamente';
+              this.errorMessage = 'este no es un repartidor';
               return;
             }
           else{
@@ -51,7 +51,7 @@ export class InicsesComponent  implements OnInit {
           }})
     }
   async ngOnInit() {
-    await this.data.set('name', 'Ionic');
+    console.log(this.db.AllRep())
   }
 
 }

@@ -1,4 +1,15 @@
 
 <ion-content [fullscreen]="true">
-  <img src="https://img.game8.co/3314347/39065bc22cef52bddc9fa7f48ac8c7e1.png/show">
+  <div *ngIf="repartidor$ | async as repartidor; else loading">
+    <ion-card>
+    <h1>{{ repartidor[0].nombre }} {{ repartidor[0].apellido }}</h1>
+    <p><strong>Teléfono:</strong> {{ repartidor[0].telefono }}</p>
+    <p><strong>Puntaje:</strong> {{ repartidor[0].puntaje }}</p>
+    <p><strong>Disponibilidad:</strong> {{ repartidor[0].disponibilidad }}</p>
+    <ion-button (click)="SetMode()"> cambiar disponibilidad</ion-button>
+  </ion-card>
+  </div>
+  <ng-template #loading>
+    <p>Cargando datos del repartidor...</p>
+  </ng-template>
 </ion-content>

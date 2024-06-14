@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { Observable, Subscription } from 'rxjs';
 import { AuthService } from 'src/app/Services/AuthService/auth.service';
 import { DatabaseService, RepOut } from 'src/app/Services/DatabaseService/database.service';
+import { DataService } from 'src/app/Services/DataService/data.service';
 
 // @ts-ignore
 
@@ -30,7 +31,7 @@ export class RegistroComponent implements OnInit {
   telefono: number = 0;
 
 
-  constructor(private authService: AuthService, private router: Router, private db : DatabaseService) { }
+  constructor(private authService: AuthService, private router: Router, private db : DatabaseService, private data : DataService) { }
   ngOnInit(){}
 
   // metodo llama a AuthService para registrar, luego, si es efectivo el registro, inicia sesion
@@ -42,6 +43,8 @@ export class RegistroComponent implements OnInit {
     const result = await this.authService.signUp(this.email, this.password);
     if (result == true) {
       this.authService.signIn(this.email, this.password);
+      const repa = [this.email, this.password];
+      this.data.setItem('repa', repa);
       this.db.AddRep(this.nombre, this.email, this.telefono, this.apellido);
       this.router.navigate(['/main']);
     }}
