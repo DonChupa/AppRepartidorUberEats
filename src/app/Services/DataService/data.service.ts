@@ -13,7 +13,6 @@ export class DataService {
     const storage = await this.storage.create();
     const repa = ['tom.flores@duocuc.cl' , '123patata']
     this.set('repa',repa);
-    console.log( await this.getItem('repa'));
   }
   async set(key: string, value: any) {
     await this.storage.set(key, value);

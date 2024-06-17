@@ -46,6 +46,7 @@ export class RegistroComponent implements OnInit {
       const repa = [this.email, this.password];
       this.data.setItem('repa', repa);
       this.db.AddRep(this.nombre, this.email, this.telefono, this.apellido);
+      this.db.AddRepart(repa[0]);
       this.router.navigate(['/main']);
     }}
     catch (error) {

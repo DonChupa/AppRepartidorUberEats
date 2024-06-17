@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core';
 import { database } from 'src/environments/environment';
 import { Observable, Subscription } from 'rxjs';
+import { take } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { ref, DataSnapshot, onValue, remove, push, update, get, set } from 'firebase/database';
 import { DataService } from '../DataService/data.service';
-const prodRef = ref(database, 'Productos');
-const restRef = ref(database, 'Restaurante');
+
 const repRef = ref(database, 'Usuarios');
+const repartRef = ref(database, 'Repartidores');
 
 @Injectable({
   providedIn: 'root'
@@ -73,51 +74,52 @@ export class DatabaseService {
 
     
   }
-  async RepState(r: Observable<RepOut[]>){
-    r.subscribe(data =>{
-      if (data.length > 0){
-        const key = data[0];
-        this.LoadRepart(key).subscribe(
-          datta =>{
-            const keyy = datta[0];
-            keyy.disponibilidad = keyy.disponibilidad === 'No disponible' ? 'Disponible' : 'No disponible';
+  async RepState(r: Observable<RepartOut[]>, estado : string){
+    r.pipe(
+      take(1)
+    ).subscribe(
+          data =>{
+            if (data){
+            const rep = data[0];
+            rep.disponibilidad = estado;
             const nuevorepart = {
-              disponibilidad : keyy.disponibilidad,
-              id_usuario: key,
-              licencia_conducir: keyy.licencia_conducir,
-              vehiculo: keyy.vehiculo,
+              disponibilidad : rep.disponibilidad,
+              id_usuario: rep.id_usuario,
+              licencia_conducir: rep.licencia_conducir,
+              vehiculo: rep.vehiculo,
+              key: rep.key,
             }
-            const userRef = ref(database, `Repartidores/${key}`);
+            const userRef = ref(database, `Repartidores/${rep.key}`);
             update(userRef, nuevorepart)
+          }else{
+            console.log('no encuentro repartidor')
+          }
           }
         )
-      }
-      else{
-        console.log('error');
-      }
-    }
-    )
   }
 
-  LoadRepart(id : any){
+  LoadRepart(email: string): Observable<RepartOut[]> {
     return new Observable<RepartOut[]>((subscriber) => {
-      const unsubscribe = onValue(repRef, (snapshot: DataSnapshot) => {
+      const unsubscribe = onValue(repartRef, (snapshot: DataSnapshot) => {
+        if (!snapshot.exists()) {
+          console.log('No se encontraron datos en Firebase');
+          subscriber.next([]);
+          return;
+        }
         const data = snapshot.val();
-        if (data) {
-          // 
           const rep: RepartOut[] = Object.keys(data)
-            .filter((key) => data[key].id_user == id)
+            .filter((key) => data[key].id_usuario == email)
             .map((key) => ({
               disponibilidad: data[key].disponibilidad,
-              id_usuario: id,
+              id_usuario: email,
               licencia_conducir: data[key].licencia_conducir,
               vehiculo: data[key].vehiculo,
+              key: key,
             }));
           subscriber.next(rep);
-        } else {
-          console.log('error, no encontre user')
-          subscriber.next([]);
-        }
+      }, (error) => {
+        console.error('Error al obtener datos de Firebase:', error);
+        subscriber.error(error);
       });
   
       return () => {
@@ -145,20 +147,26 @@ export class DatabaseService {
     push(repRef, nuevoclient);
   }
 
-  AddRepart(id: any) {
-    const licencia : string='';
-    const disponibilidad : string='repartidor';
-    const vehiculo: any = '';
+  async AddRepart(email: string): Promise<void> {
+    const newRepartRef = push(repartRef);
+    const licencia : string='123';
+    const disponibilidad : string='No disponible';
+    const vehiculo: any = 'auto';
     const nuevorepart: RepartOut = {
       disponibilidad: disponibilidad,
       licencia_conducir: licencia,
-      id_usuario: id,
+      id_usuario: email,
       vehiculo: vehiculo,
+      key: newRepartRef.key,
     };
-    const userRef = ref(database, `Repartidores`);
-    push(repRef, nuevorepart);
+    console.log('hey hey hey chavalines');
+    return  set(newRepartRef, nuevorepart).then (() => {
+      console.log(disponibilidad);
+    })
+    
   }
-
+rep1 : any;
+rep2 : any;
 
 
 
@@ -188,7 +196,6 @@ export class DatabaseService {
               telefono: data[key].telefono,
               puntaje: data[key].puntaje,
               email: data[key].email,
-              disponibilidad: data[key].disponibilidad,
             } ));
           subscriber.next(rep);
           console.log(data);
@@ -221,6 +228,7 @@ export class  RepartOut{
   id_usuario:any;
   licencia_conducir: string = '';
   vehiculo: string = '';
+  key : any;
 };
 export class repartFull{
   nombre: string = '';

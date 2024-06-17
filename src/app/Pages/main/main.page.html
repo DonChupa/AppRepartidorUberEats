@@ -5,11 +5,16 @@
     <h1>{{ repartidor[0].nombre }} {{ repartidor[0].apellido }}</h1>
     <p><strong>Teléfono:</strong> {{ repartidor[0].telefono }}</p>
     <p><strong>Puntaje:</strong> {{ repartidor[0].puntaje }}</p>
-    <p><strong>Disponibilidad:</strong> {{ repartidor[0].disponibilidad }}</p>
-    <ion-button (click)="SetMode()"> cambiar disponibilidad</ion-button>
+    <div *ngIf="repartidor2$ | async as repartidor2; else charge">
+  <p><strong>Puntaje:</strong> {{ repartidor2[0].disponibilidad }}</p>
+      <ion-button (click)="SetMode()"> cambiar disponibilidad</ion-button>
+    </div>
   </ion-card>
   </div>
   <ng-template #loading>
+    <p>Cargando datos del repartidor...</p>
+  </ng-template>
+  <ng-template #charge>
     <p>Cargando datos del repartidor...</p>
   </ng-template>
 </ion-content>
