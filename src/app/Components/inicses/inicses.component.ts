@@ -46,7 +46,7 @@ export class InicsesComponent  implements OnInit {
           }
         }}
             else{
-              this.errorMessage = 'usuario no existe';
+              this.errorMessage = 'Este no es un repartidor';
             }
           }})
     }

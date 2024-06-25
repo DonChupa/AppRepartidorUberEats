@@ -25,9 +25,7 @@ export class AuthService {
     return this.isAuthenticated.asObservable();
   }
   constructor(private afAuth: AngularFireAuth, private router: Router, private data : DataService)
-   {this.exist();
-    
-   }
+   {this.exist();}
   // metodo crear cuenta con manejo de errores
   async signIn(email: string, password: string): Promise<boolean> {
     try {
@@ -62,12 +60,15 @@ export class AuthService {
 async signOut(): Promise<void> {
   await this.afAuth.signOut();
   this.isAuthenticated.next(false);
+  const user = ['',''];
+  this.data.setItem('user', user);
+  this.router.navigate(['/main']);
 };
 
 // no me acuerdo que hace pero si se borra no funciona
 async exist(){
  try {
-    const existe = await this.data.getItem('user');
+    const existe = await this.data.getItem('repa');
     console.log('funciona biennn');
     this.signIn(existe[0], existe[1]);
 } catch (error) {
