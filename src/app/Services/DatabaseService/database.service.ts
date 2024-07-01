@@ -33,7 +33,9 @@ export class DatabaseService {
               telefono: data[key].telefono,
               puntaje: data[key].puntaje,
               email: email,
+              key: key,
             }));
+            console.log();
           subscriber.next(rep);
         } else {
           console.log('error, no encontre user')
@@ -48,31 +50,28 @@ export class DatabaseService {
   }
 
 
-  UpdateRep(nombre: string, email: string, tefono: number, key: any, direccion: string, apellido:string){
-    const img: string ='';
-    const puntos: any ='';
-    const hol: string = 'repartidor';
-    const disp = 'No disponible';
+  UpdateRep(user: RepOut){
+    const key = user.key;
     const userRef = ref(database, `Usuarios/${key}`);
-    const nuevoUser: RepOut = {
-      nombre: nombre,
-      imagen: img,
-      apellido: apellido,
-      direccion: direccion,
-      tipo_usuario: hol,
-      telefono: tefono, 
-      email: email,
-      puntaje: puntos,
-    };
-    update(userRef, nuevoUser)
+    update(userRef, user)
     .then(() => {
       console.log('listo');
     })
     .catch((error) => {
       console.error('Error:', error);
     });
+  }
 
-    
+  UpdateRepart(Rep: RepartOut){
+    const key = Rep.key;
+    const userRef = ref(database, `Repartidores/${key}`);
+    update(userRef, Rep)
+    .then(() => {
+      console.log('listo');
+    })
+    .catch((error) => {
+      console.error('Error:', error);
+    });
   }
   async RepState(r: Observable<RepartOut[]>, estado : string){
     r.pipe(
@@ -129,46 +128,19 @@ export class DatabaseService {
   }
 
   
-  AddRep(nombre: string, email: string, tefono: number, apellido: string) {
-    const hola : string='';
-    const img : string = 'https://img.freepik.com/fotos-premium/repartidor-sobre-amarillo-aislado-pulgares-arriba-porque-algo-bueno-ha-sucedido_1368-70622.jpg';
-    const hol : string='repartidor';
-    const punt : any = '';
-    const nuevoclient: RepOut = {
-      nombre: nombre,
-      imagen: img,
-      apellido: apellido,
-      direccion: hola,
-      tipo_usuario: hol,
-      telefono: tefono, 
-      puntaje: punt,
-      email: email,
-    };
-    push(repRef, nuevoclient);
+  AddRep(nuevoClient : RepOut) {
+    const newRef = push(repRef, nuevoClient);
+    nuevoClient.key = newRef.key,
+    update(ref(database, 'Usuarios/{nuevoClient.key}'),nuevoClient);
   }
 
-  async AddRepart(email: string): Promise<void> {
-    const newRepartRef = push(repartRef);
-    const licencia : string='123';
-    const disponibilidad : string='No disponible';
-    const vehiculo: any = 'auto';
-    const nuevorepart: RepartOut = {
-      disponibilidad: disponibilidad,
-      licencia_conducir: licencia,
-      id_usuario: email,
-      vehiculo: vehiculo,
-      key: newRepartRef.key,
-    };
-    console.log('hey hey hey chavalines');
-    return  set(newRepartRef, nuevorepart).then (() => {
-      console.log(disponibilidad);
-    })
-    
+  async AddRepart(email: string,nuevorepart : RepartOut): Promise<void> {
+    nuevorepart.id_usuario = email;
+    const newRef = push(repartRef, nuevorepart);
+    nuevorepart.key = newRef.key;
+    update(ref(database, 'Repart/{nuevorepart.key}'),nuevorepart);
+
   }
-rep1 : any;
-rep2 : any;
-
-
 
   RemoveRep(claveUnica: any) {
     remove(ref(database,`Usuarios/${claveUnica.id}`))
@@ -185,8 +157,8 @@ rep2 : any;
       const unsubscribe = onValue(repRef, (snapshot: DataSnapshot) => {
         const data = snapshot.val();
         if (data > 0) {
-          // 
           const rep: RepOut[] = Object.keys(data)
+          .filter( key => ( data[key].tipo_usuario = 'repartidor') )
             .map((key) => ({
               nombre: data[key].nombre,
               imagen: data[key].imagen,
@@ -196,6 +168,7 @@ rep2 : any;
               telefono: data[key].telefono,
               puntaje: data[key].puntaje,
               email: data[key].email,
+              key:data[key].key,
             } ));
           subscriber.next(rep);
           console.log(data);
@@ -219,9 +192,10 @@ export class  RepOut{
   imagen: string = '';
   direccion: string = '';
   tipo_usuario:string = 'repartidor';
-  telefono: number = 0;
+  telefono: number|any = 0;
   puntaje:any;
   email: string = '';
+  key : any;
 };
 export class  RepartOut{
   disponibilidad: string = 'No disponible';

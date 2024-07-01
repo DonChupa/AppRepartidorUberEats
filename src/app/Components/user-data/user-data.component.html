@@ -1,0 +1,71 @@
+<ion-content [fullscreen]="true">
+  <div *ngIf="repartidor$ | async as repartidor; else loading">
+    <ion-card class="carta">
+      <img [src]="repartidor[0].imagen" alt="" class="medium">
+    <font size="7"> {{ repartidor[0].nombre }} {{ repartidor[0].apellido }}</font>
+    <p><strong>Teléfono:</strong> {{ repartidor[0].telefono }}</p>
+    <p><strong>Puntaje:</strong> {{ repartidor[0].puntaje }}</p>
+    <div *ngIf="repartidor2$ | async as repartidor2; else charge">
+  <p><strong>Disponibilidad:</strong> {{ repartidor2[0].disponibilidad }}</p>
+  <div style="display:flex; justify-content: space-around;">
+      <ion-button (click)="SetMode()"> cambiar disponibilidad</ion-button>
+      <ion-button (click)="openModal(repartidor[0], repartidor2[0])"> Modificar Perfil</ion-button>
+     
+
+      <ion-modal #Modal>
+        <ng-template>
+          <ion-card style="text-align: center; padding:5%;display:flex; flex-direction: column;">
+            <div style="display: flex; align-items: center; flex-direction: column;">
+            <font size="7"> Modificar Datos</font>
+            <img [src]="repp.imagen" alt="" class="medium">
+            <ion-input type="file" (change)="onFileSelected($event)"></ion-input>
+
+            <div class="flix">
+            <p><strong>nombre: </strong></p>
+            <ion-input [(ngModel)]="repp.nombre" name="nombre" placeholder="nombre" type="text"></ion-input>
+          </div>
+
+          <div class="flix">
+            <p><strong>apellido: </strong> </p>
+            <ion-input [(ngModel)]="repp.apellido" name="nombre" placeholder="nombre" type="text"></ion-input>
+          </div>
+
+          <div class="flix">
+            <p><strong>telefono: </strong></p>
+            <ion-input [(ngModel)]="repp.telefono" name="nombre" placeholder="nombre" type="text"></ion-input>
+          </div>
+
+            <div class="flix">
+            <p><strong>vehiculo: </strong></p> 
+            <ion-input [(ngModel)]="reppa.vehiculo" name="vehiculo" placeholder="vehiculo" type="text"></ion-input>
+          </div>
+
+            <ion-button (click)="update()">Aceptar</ion-button>
+            <ion-button (click)="closeModal()">Cancelar</ion-button>
+          </div>
+          </ion-card>
+        </ng-template>
+       </ion-modal>
+
+
+    </div>
+    <ion-button (click)="Out()"> cerrar sesión</ion-button>
+    </div>
+    
+  </ion-card>
+
+
+  
+
+
+  </div>
+  <ng-template #loading>
+    <p>Cargando datos del repartidor...</p>
+  </ng-template>
+  <ng-template #charge>
+    <p>Cargando datos del repartidor...</p>
+  </ng-template>
+
+
+
+</ion-content>

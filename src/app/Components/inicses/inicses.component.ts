@@ -1,9 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from 'src/app/Services/AuthService/auth.service';
 import { Router } from '@angular/router';
-
-import { getDatabase, ref} from 'firebase/database';
-import { database } from 'src/environments/environment';
 import { DataService } from 'src/app/Services/DataService/data.service';
 import { DatabaseService,RepOut } from 'src/app/Services/DatabaseService/database.service';
 import { Observable,Subscription } from 'rxjs';
@@ -41,8 +38,6 @@ export class InicsesComponent  implements OnInit {
           else{
             const repa = [this.email, this.password];
             this.data.setItem('repa', repa);
-            const a = await this.data.getItem('repa');
-            this.router.navigate(['/main']);
           }
         }}
             else{

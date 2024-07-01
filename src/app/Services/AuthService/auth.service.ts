@@ -31,10 +31,10 @@ export class AuthService {
     try {
       await this.afAuth.signInWithEmailAndPassword(email, password);
       this.isAuthenticated.next(true);
-      console.log('exito')
-      console.log(this.isAuthenticated.value)
+      console.log('exito');
+      console.log(this.isAuthenticated.value);
+      this.router.navigate(['/user']);
       return true;
-      
     } catch (error) {
       console.log("Error al iniciar sesión: ", error);
       return false;
@@ -60,9 +60,9 @@ export class AuthService {
 async signOut(): Promise<void> {
   await this.afAuth.signOut();
   this.isAuthenticated.next(false);
-  const user = ['',''];
-  this.data.setItem('user', user);
-  this.router.navigate(['/main']);
+  const repa = ['',''];
+  this.data.setItem('repa', repa);
+  this.router.navigate(['/user']);
 };
 
 // no me acuerdo que hace pero si se borra no funciona

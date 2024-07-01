@@ -1,0 +1,14 @@
+.flix{
+    display:flex; 
+    justify-content: space-between;
+}
+.medium{
+    height: 50%; 
+    width: 50%;
+}
+.carta{
+    text-align: center; 
+    display:flex; 
+    flex-direction: column;
+    align-items: center;
+}

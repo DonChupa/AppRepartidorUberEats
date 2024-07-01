@@ -1,0 +1,18 @@
+<div *ngIf="content; else loading">
+  <div style="width: 90%; text-align: center; margin-top: 30%;">
+  <font size="7"> Antes de continuar, necesitas rellenar los siguientes datos</font>
+</div>
+  <ion-card>
+<form (ngSubmit)="olas()">
+  <ion-input [(ngModel)]="repart.vehiculo" name="vehiculo" label="Vehiculo" type="text"label-placement="floating"></ion-input>
+  <ion-input [(ngModel)]="repart.licencia_conducir" name="licencia_conducir" label="Licencia Conducir" type="text"label-placement="floating"></ion-input>
+<ion-button  type="submit" style="--background:green; --border-radius: 10px; display: block;  margin: 20px; color: black;height: 50px;">Añadir Datos</ion-button>
+<div *ngIf="errorMessage" class="error-message">
+{{ errorMessage }}
+</div>
+</form>
+</ion-card>
+</div>
+<ng-template #loading>
+  <img src="https://cdn.dribbble.com/users/645440/screenshots/3266490/loader-2_food.gif" alt="Loading">
+</ng-template>

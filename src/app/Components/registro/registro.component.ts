@@ -1,6 +1,6 @@
 import { Component, NgModule, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { Observable, Subscription } from 'rxjs';
+import { empty, Observable, Subscription } from 'rxjs';
 import { AuthService } from 'src/app/Services/AuthService/auth.service';
 import { DatabaseService, RepOut } from 'src/app/Services/DatabaseService/database.service';
 import { DataService } from 'src/app/Services/DataService/data.service';
@@ -21,14 +21,22 @@ export interface DocumentSnapshotExists<T> extends firebase.firestore.DocumentSn
 
 
 export class RegistroComponent implements OnInit {
-  
+  repi :RepOut ={
+    nombre: '',
+    apellido: '',
+    direccion: '',
+    email: '',
+    telefono: undefined,
+    imagen: '',
+    tipo_usuario: 'repartidor',
+    puntaje: '',
+    key: '',
+  }
  // variables conectadas al formulario
-  email: string = '';
+
   password: string = '';
   errorMessage: string = '';
-  nombre: string= '';
-  apellido: string= '';
-  telefono: number = 0;
+
 
 
   constructor(private authService: AuthService, private router: Router, private db : DatabaseService, private data : DataService) { }
@@ -36,18 +44,17 @@ export class RegistroComponent implements OnInit {
 
   // metodo llama a AuthService para registrar, luego, si es efectivo el registro, inicia sesion
   async register() {
-    if (!this.email || !this.password || !this.nombre || !this.apellido || !this.telefono) {
+    if (!this.repi.email || !this.password || !this.repi.nombre || !this.repi.apellido || !this.repi.telefono) {
       this.errorMessage = 'Por favor, completa todos los campos.';
     } else {
     try {
-    const result = await this.authService.signUp(this.email, this.password);
+    const result = await this.authService.signUp(this.repi.email, this.password);
     if (result == true) {
-      this.authService.signIn(this.email, this.password);
-      const repa = [this.email, this.password];
+      this.authService.signIn(this.repi.email, this.password);
+      const repa = [this.repi.email, this.password];
       this.data.setItem('repa', repa);
-      this.db.AddRep(this.nombre, this.email, this.telefono, this.apellido);
-      this.db.AddRepart(repa[0]);
-      this.router.navigate(['/main']);
+      this.db.AddRep(this.repi);
+      this.router.navigate(['/repart']);
     }}
     catch (error) {
       console.log('Error durante el registro:', error);
