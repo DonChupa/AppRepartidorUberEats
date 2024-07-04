@@ -13,7 +13,7 @@ import { AuthService } from 'src/app/Services/AuthService/auth.service';
 })
 export class UserDataComponent  implements OnInit {
   @ViewChild('Modal') modal: IonModal | any;
-  selectedImage: string | ArrayBuffer | any;
+
   repp : RepOut = {
     nombre : '',
     imagen: '',
