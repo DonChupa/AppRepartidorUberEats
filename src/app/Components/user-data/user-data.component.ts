@@ -51,8 +51,12 @@ export class UserDataComponent  implements OnInit {
     this.cond = !this.cond;
     if (this.cond){
       this.db.RepState(this.repartidor2$, 'Disponible');
+      
     }else{
       this.db.RepState(this.repartidor2$, 'No disponible');
+      this.data.set('ubi', this.repp.direccion);
+      this.repp.direccion = [''];
+      this.db.UpdateRep(this.repp);
     }
   }
   openModal(r : RepOut, rep :RepartOut) {

@@ -2,3 +2,17 @@
 <ion-content [fullscreen]="true">
 <app-user-data></app-user-data>
 </ion-content>
+<ion-footer>
+
+    <ion-tab-bar slot="bottom">
+      <ion-tab-button [routerLink]="['/main']">
+        <ion-icon name="play-circle"></ion-icon>
+        Perfil
+      </ion-tab-button>
+      <ion-tab-button [routerLink]="['/user']">
+        <ion-icon name="radio"></ion-icon>
+        Mapa
+      </ion-tab-button>
+    </ion-tab-bar>
+  
+  </ion-footer>

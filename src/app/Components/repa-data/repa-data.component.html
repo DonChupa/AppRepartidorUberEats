@@ -14,6 +14,12 @@
 </ion-card>
 </div>
 <ng-template #loading>
-  <ion-button (click)="getCurrentPosition()">Get Current Position</ion-button>
-  <div id="map" style="height: 400px; width: 100%;"></div>
-</ng-template>
+
+  <ion-grid style="height: 100%;">
+    <ion-row style="height: 100%; display: flex; justify-content: center; align-items: center;">
+      <ion-col size="10" style="height: 80%;">
+        <div id="map" style="height: 100%; width: 100%;"></div>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+

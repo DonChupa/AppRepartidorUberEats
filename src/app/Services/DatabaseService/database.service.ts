@@ -192,7 +192,7 @@ export class  RepOut{
   nombre: string = '';
   apellido: string = '';
   imagen: string = '';
-  direccion: string = '';
+  direccion: any = '';
   tipo_usuario:string = 'repartidor';
   telefono: number|any = 0;
   puntaje:any;
