@@ -14,5 +14,6 @@
 </ion-card>
 </div>
 <ng-template #loading>
-  <img src="https://cdn.dribbble.com/users/645440/screenshots/3266490/loader-2_food.gif" alt="Loading">
+  <ion-button (click)="getCurrentPosition()">Get Current Position</ion-button>
+  <div id="map" style="height: 400px; width: 100%;"></div>
 </ng-template>

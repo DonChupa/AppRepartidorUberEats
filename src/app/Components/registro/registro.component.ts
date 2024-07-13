@@ -31,10 +31,10 @@ export class RegistroComponent implements OnInit {
     tipo_usuario: 'repartidor',
     puntaje: '',
     key: '',
+    pass: '',
   }
  // variables conectadas al formulario
 
-  password: string = '';
   errorMessage: string = '';
 
 
@@ -44,14 +44,14 @@ export class RegistroComponent implements OnInit {
 
   // metodo llama a AuthService para registrar, luego, si es efectivo el registro, inicia sesion
   async register() {
-    if (!this.repi.email || !this.password || !this.repi.nombre || !this.repi.apellido || !this.repi.telefono) {
+    if (!this.repi.email || !this.repi.pass || !this.repi.nombre || !this.repi.apellido || !this.repi.telefono) {
       this.errorMessage = 'Por favor, completa todos los campos.';
     } else {
     try {
-    const result = await this.authService.signUp(this.repi.email, this.password);
+    const result = await this.authService.signUp(this.repi);
     if (result == true) {
-      this.authService.signIn(this.repi.email, this.password);
-      const repa = [this.repi.email, this.password];
+      this.authService.signIn(this.repi.email, this.repi.pass);
+      const repa = [this.repi.email, this.repi.pass];
       this.data.setItem('repa', repa);
       this.db.AddRep(this.repi);
       this.router.navigate(['/repart']);

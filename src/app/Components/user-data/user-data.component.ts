@@ -24,6 +24,7 @@ export class UserDataComponent  implements OnInit {
     puntaje: 0,
     email: '',
     key:'',
+    pass: '',
   };
  reppa: RepartOut = {
   disponibilidad: '',

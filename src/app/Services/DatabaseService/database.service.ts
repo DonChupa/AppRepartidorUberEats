@@ -34,6 +34,7 @@ export class DatabaseService {
               puntaje: data[key].puntaje,
               email: email,
               key: key,
+              pass: data[key].pass,
             }));
             console.log();
           subscriber.next(rep);
@@ -168,7 +169,8 @@ export class DatabaseService {
               telefono: data[key].telefono,
               puntaje: data[key].puntaje,
               email: data[key].email,
-              key:data[key].key,
+              key: key,
+              pass: data[key].pass,
             } ));
           subscriber.next(rep);
           console.log(data);
@@ -196,6 +198,7 @@ export class  RepOut{
   puntaje:any;
   email: string = '';
   key : any;
+  pass: string ='';
 };
 export class  RepartOut{
   disponibilidad: string = 'No disponible';

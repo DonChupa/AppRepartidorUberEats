@@ -7,7 +7,7 @@
             <h1 style="margin: 20px; font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif; color: black;">Bienvenido</h1>
           </div> 
             <nav >
-        <form (ngSubmit)="Login()">
+
           <label for="" style="margin: 20px; font-family: Verdana, Geneva, Tahoma, sans-serif; ">Correo Electronico</label>
             <div class="login-1">
               <div>
@@ -23,12 +23,12 @@
               </div>
             </div>
             <div class="boton-si">
-              <ion-button  type="submit" >iniciar sesion</ion-button>
+              <ion-button  (click)="Login()">iniciar sesion</ion-button>
             </div>
           <div *ngIf="errorMessage" class="error-message" style="color: #FF5C00; margin: 20px;">
             {{ errorMessage }}
           </div>
-        </form>
+        
         </nav>
 
         <div style="margin-left: 95px;">

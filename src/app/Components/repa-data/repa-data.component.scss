@@ -1,0 +1,11 @@
+#map-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  #map {
+    max-width: 300px;  /* Ajusta este valor según el tamaño deseado */
+    max-height: 300px; /* Ajusta este valor según el tamaño deseado */
+    border: 1px solid #ccc;
+  }
