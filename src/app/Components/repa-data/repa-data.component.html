@@ -18,8 +18,23 @@
   <ion-grid style="height: 100%;">
     <ion-row style="height: 100%; display: flex; justify-content: center; align-items: center;">
       <ion-col size="10" style="height: 80%;">
-        <div id="map" style="height: 100%; width: 100%;"></div>
+        <div id="map" style="height: 60%; width: 100%;"></div>
       </ion-col>
     </ion-row>
   </ion-grid>
+  <nav *ngIf="perso">
+    <ion-button (click)="entregar()"> Entregar Pedido</ion-button>
+  </nav>
+  <ion-card>
+
+    <div *ngFor="let p of pedidos">
+      <ion-card>
+      <div *ngFor="let c of p.pedidos">
+        <p> {{c.producto}}  {{c.cantidad}}</p>
+      </div>
+      <ion-button (click)="MarcarRuta(p.direccion[0], p.direccion[1], p)"> aceptar encargo </ion-button>
+    </ion-card>
+    </div>
+  </ion-card>
+  </ng-template>
 

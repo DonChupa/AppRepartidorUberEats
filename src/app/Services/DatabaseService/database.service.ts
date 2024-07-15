@@ -8,6 +8,8 @@ import { DataService } from '../DataService/data.service';
 
 const repRef = ref(database, 'Usuarios');
 const repartRef = ref(database, 'Repartidores');
+const histRef = ref(database, 'Entrega');
+const pefRef = ref(database, 'Historial');
 
 @Injectable({
   providedIn: 'root'
@@ -152,7 +154,69 @@ export class DatabaseService {
         console.error('Error al eliminar repartidor:', error);
       });
   }
-
+  LoadEntregas(id: any): Observable<EntregOut[]> {
+    return new Observable<EntregOut[]>((subscriber) => {
+      const unsubscribe = onValue(histRef, (snapshot: DataSnapshot) => {
+        const data = snapshot.val();
+        if (data) {
+          const pedids: EntregOut[] = Object.keys(data)
+            .filter((key) => data[key].id_repartidor == id)
+            .map((key) => ({
+              id_restaurante: data[key].id_restaurante,
+              direccion: data[key].direccion,
+              estado:  data[key].estado,
+              id_repartidor: data[key].id_repartidor,
+              key: key,
+              pedidos: data[key].pedidos,
+              id_usuario: data[key].id_usuario,
+            }));
+          subscriber.next(pedids);
+        } else {
+          subscriber.next([]);
+        }
+      });
+  
+      return () => {
+        unsubscribe();
+      };
+    });
+  }
+  removeEntrega(e : EntregOut){
+    console.log(e);
+    remove(ref(database,`Entrega/${e.key}`))
+    .then(() => {
+      console.log('Entrega Eliminada');
+      this.CreateHist(e);
+    })
+    .catch((error) => {
+      console.error('Error al eliminar:', error);
+    });
+}
+CreateHist(e : EntregOut){
+  console.log(e);
+  let hist : HistoryOut = {
+    id_restaurante : e.id_restaurante,
+    direccion : e.direccion ,
+    estado: 'Finalizado',
+    repartidor : '',
+    fotoRepp: '',
+    key: '',
+    pedidos: e.pedidos,
+    id_usuario: e.id_usuario,
+  }
+  this.loadRep(e.id_repartidor).subscribe(
+    data => {
+      hist.repartidor = data[0].nombre + ' '+ data[0].apellido;
+      hist.fotoRepp = data[0].imagen;
+      console.log(hist);
+      const newRef = push(pefRef, hist);
+      const key = newRef.key;
+      hist.key = key,
+      update(newRef, hist);
+    }
+  )
+}
+  
   AllRep(): Observable<RepOut[]> {
     return new Observable<RepOut[]>((subscriber) => {
       const unsubscribe = onValue(repRef, (snapshot: DataSnapshot) => {
@@ -207,16 +271,32 @@ export class  RepartOut{
   vehiculo: string = '';
   key : any;
 };
-export class repartFull{
-  nombre: string = '';
-  apellido: string = '';
-  imagen: string = '';
-  direccion: string = '';
-  tipo_usuario:string = 'repartidor';
-  telefono: number = 0;
-  puntaje:any;
-  email: string = '';
-  disponibilidad: string = 'No disponible';
-  licencia_conducir: string = '';
-  vehiculo: string = '';
-}
+export class EntregOut{
+  id_restaurante: string='';
+  direccion: any = [0,0];
+  estado:string = '';
+  id_repartidor: any;
+  key: any;
+  pedidos:PedidOut[] = [];
+  id_usuario: any='';
+};
+export class PedidOut{
+  cantidad: number = 1;
+  estado: string = '';
+  id_usuario: any;
+  producto: any;
+  precio: number = 0;
+  key: any;
+  id_rest: any;
+  imagen: any;
+  };
+  export class HistoryOut{
+    id_restaurante: string='';
+    direccion: string = '';
+    estado:string = '';
+    repartidor: string = '';
+    fotoRepp: any;
+    key: any;
+    pedidos:PedidOut[] = [];
+    id_usuario: any='';
+  };

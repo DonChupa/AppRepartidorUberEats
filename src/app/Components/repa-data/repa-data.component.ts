@@ -1,6 +1,6 @@
 import { Component, OnInit, AfterViewInit, Input } from '@angular/core';
 import { DataService } from 'src/app/Services/DataService/data.service';
-import { DatabaseService, RepOut} from 'src/app/Services/DatabaseService/database.service';
+import { DatabaseService, EntregOut, PedidOut, RepOut} from 'src/app/Services/DatabaseService/database.service';
 import { RepartOut } from 'src/app/Services/DatabaseService/database.service';
 import { Geolocation } from '@capacitor/geolocation';
 import * as L from 'leaflet';
@@ -13,8 +13,8 @@ import * as L from 'leaflet';
 export class RepaDataComponent implements OnInit, AfterViewInit {
   latitude!: number;
   longitude!: number;
-  @Input() destinationLat: number = 40.748817; // Ejemplo: Coordenadas del Empire State Building
-  @Input() destinationLng: number = -73.985428;
+  lat2!: number;
+  long2!:number;
 
   // formulario
   a: any;
@@ -40,8 +40,10 @@ export class RepaDataComponent implements OnInit, AfterViewInit {
     key:'',
     pass: '',
   };
-content2: boolean | any;
 
+  pedidos: EntregOut[] = [];
+content2: boolean | any;
+perso : boolean = false;
   private map!: L.Map;
   private updateInterval: any;
 
@@ -49,7 +51,18 @@ content2: boolean | any;
 
   async ngOnInit() {
     this.verContent();
+    this.perso = await this.data.getItem('perso');
+    this.lat2 = await this.data.getItem('lat2');
+    this.long2 = await this.data.getItem('long2');
+    console.log(await this.data.getItem('lat2'));
+    console.log(await this.data.getItem('long2'));
     this.a = await this.data.getItem('repa');
+    this.db.LoadEntregas(this.a[0]).subscribe(
+      (data:EntregOut[]) => {
+        
+        this.pedidos = data;
+      }
+    )
     this.db.loadRep(this.a[0]).subscribe(
       data => {
         this.repp = data[0];
@@ -63,7 +76,14 @@ content2: boolean | any;
       }
     )
   }
-
+  async entregar(){
+    this.perso = false;
+    this.resetMap();
+    this.initMap();
+    this.data.set('perso', false);
+    const entre = await this.data.getItem('entre');
+    this.db.removeEntrega(entre);
+  }
   disp (c : string){
     if (c == 'Disponible'){
       this.content2=  true;
@@ -83,12 +103,31 @@ content2: boolean | any;
       this.updateMap();
     }, 1000);
   }
+  async MarcarRuta(lat: number, lng : number, e : EntregOut): Promise<void> {
+    this.perso = true;
+    this.data.setItem('entre', e);
+    this.data.setItem('perso', this.perso);
+    console.log(await this.data.getItem('perso'));
 
-  private updateMap(): void {
+
+    this.lat2= lat;
+    this.long2= lng;
+    this.data.setItem('lat2', this.lat2);
+    this.data.setItem('long2', this.long2);
+   this.updateMap();
+  }
+    
+  
+
+  private async updateMap(): Promise<void> {
     // Centrar el mapa en la nueva posición del usuario
     this.getCurrentPosition();
     this.map.setView([this.repp.direccion[0],this.repp.direccion[1]], this.map.getZoom());
-  
+    this.perso = await this.data.getItem('perso');
+    if (this.perso == false){
+      this.lat2 = this.repp.direccion[0];
+      this.long2 = this.repp.direccion[1];
+    }
     // Limpiar y volver a dibujar el círculo en la nueva ubicación
     this.map.eachLayer((layer) => {
       if (layer instanceof L.Circle) {
@@ -102,6 +141,17 @@ content2: boolean | any;
       fillOpacity: 0.5,
       radius: 1 // Ajusta el radio según tus necesidades
     }).addTo(this.map);
+
+    // Trazar línea desde la ubicación del usuario hasta el destino
+    const latlngs: L.LatLngExpression[] = [
+      [this.latitude, this.longitude],
+      [this.lat2, this.long2]
+    ];
+
+    const polyline = L.polyline(latlngs, { color: 'blue' }).addTo(this.map);
+
+    // Ajustar la vista del mapa para que incluya ambos puntos
+    this.map.fitBounds(polyline.getBounds());
   }
   
   // Asegúrate de limpiar el intervalo cuando el componente se destruya
@@ -143,6 +193,8 @@ content2: boolean | any;
 
   private initMap(): void {
     this.getCurrentPosition();
+    this.lat2 = this.repp.direccion[0];
+    this.long2 =this.repp.direccion[1];
     this.map = L.map('map', {
       center: [this.repp.direccion[0],this.repp.direccion[1]], // Centro del mapa
       zoom: 20, // Nivel de zoom (ajusta según sea necesario)
@@ -150,16 +202,13 @@ content2: boolean | any;
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     }).addTo(this.map);
-
-    // Añadir círculo en la ubicación del usuario
-    L.circle([this.latitude, this.longitude], {
-      color: 'blue',
-      fillColor: '#30f',
-      fillOpacity: 0.5,
-      radius: 1 // Ajusta el radio según tus necesidades
-    }).addTo(this.map);
   }
-
+  resetMap(): void {
+    // Destruir el mapa existente
+    if (this.map) {
+      this.map.remove();
+    }
+  }
   olas() {
     console.log('olas');
     this.db.AddRepart(this.a[0], this.repart);
